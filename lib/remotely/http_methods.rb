@@ -178,6 +178,11 @@ module Remotely
       body  = Yajl::Parser.parse(response.body) rescue nil
       klass = (klass || self)
 
+      # fix for root level data in hash
+      # TODO: extract this to config: 
+      # config.strip_root_json = 'data'
+      body = body.delete('data')
+
       case body
       when Array
         Collection.new(parent, klass, body.map { |o| klass.new(o) })
