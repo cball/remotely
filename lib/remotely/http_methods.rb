@@ -1,5 +1,7 @@
 module Remotely
   module HTTPMethods
+    require 'yajl'
+
     # HTTP status codes that are represent successful requests
     SUCCESS_STATUSES = (200..299)
 
