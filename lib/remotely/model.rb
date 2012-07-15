@@ -83,7 +83,7 @@ module Remotely
       # @return [Remotely::Collection] Array-like collection of model objects.
       #
       def where(params={})
-        get URL(uri, "search"), params
+        post URL(uri, "search"), params
       end
 
       # Creates a new resource.
