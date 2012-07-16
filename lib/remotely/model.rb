@@ -208,7 +208,7 @@ module Remotely
       attrs  = new_record? ? attributes : attributes.slice(*savable_attributes)
       url    = new_record? ? uri        : URL(uri, id)
 
-      resp = public_send(method, url, attrs)
+      resp = public_send(method, url, body: {request: attrs})
       body = Yajl::Parser.parse(resp.body)
 
       if resp.status == status && !body.nil?
