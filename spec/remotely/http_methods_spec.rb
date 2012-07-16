@@ -22,4 +22,5 @@ describe Remotely::HTTPMethods do
     stub_request(:delete, %r(/things)).to_return(body: "<html><head><title></title></head></html>")
     expect { http_delete("/things") }.to raise_error(Remotely::NonJsonResponseError)
   end
+
 end

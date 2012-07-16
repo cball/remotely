@@ -359,4 +359,36 @@ describe Remotely::Model do
       subject.errors[:base].should == %w{totally failed dude}
     end
   end
+
+  # TODO: finish test
+  # context "strip root json element" do
+  #   before do
+  #     Remotely.configure do
+  #       app :the_app do
+  #         url "http://localhost:3000"
+  #         basic_auth "user", "password"
+  #         strip_root_json 'data'
+  #       end
+  #     end
+  #   end
+
+  #   after do
+  #     Remotely.reset!
+  #   end
+
+  #   it "strips the root element json from a response if it is defined" do
+  #     Remotely.configure do
+  #       app :the_app do
+  #         url "http://localhost:3000"
+  #         strip_root_json 'data'
+  #       end
+  #     end
+
+  #     puts Remotely.app(:the_app).url
+  #     stub_request(:get, %r(/members/2)).to_return(body: "{\"data\": {\"name\": \"foo\"}}")
+  #     m = Member.find(2)
+  #     puts m.inspect
+  #   end
+  # end
+
 end

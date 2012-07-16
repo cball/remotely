@@ -40,6 +40,15 @@ module Remotely
       @connection
     end
 
+    # Strip root json from incoming responses.
+    #
+    # @param [String] strip_root_json Root json to strip
+    #
+    def strip_root_json(strip_root_json=nil)
+      return @strip_root_json unless strip_root_json
+      @strip_root_json = strip_root_json
+    end
+
   private
 
     def set_scheme(url)

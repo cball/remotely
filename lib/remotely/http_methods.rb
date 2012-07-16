@@ -178,10 +178,9 @@ module Remotely
       body  = Yajl::Parser.parse(response.body) rescue nil
       klass = (klass || self)
 
-      # fix for root level data in hash
-      # TODO: extract this to config: 
-      # config.strip_root_json = 'data'
-      body = body.delete('data')
+      # strip out root json element if one is defined
+      puts "foo! #{app.strip_root_json}"
+      body = body.delete(app.strip_root_json) if app.strip_root_json.present?
 
       case body
       when Array

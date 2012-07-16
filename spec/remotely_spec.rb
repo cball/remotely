@@ -25,4 +25,9 @@ describe Remotely do
     Remotely.configure { app(:appname) { basic_auth "user", "pass" }}
     Remotely.apps[:appname].basic_auth.should == ["user", "pass"]
   end
+
+  it "saves a root json to strip out of responses" do
+    Remotely.configure { app(:appname) { strip_root_json 'data' }}
+    Remotely.apps[:appname].strip_root_json.should == 'data'
+  end
 end
