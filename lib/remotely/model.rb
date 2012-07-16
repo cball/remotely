@@ -263,8 +263,8 @@ module Remotely
       !new_record?
     end
 
-    def respond_to?(name)
-      self.attributes and self.attributes.include?(name) or super
+    def respond_to?(*args)
+      self.attributes and self.attributes.include?(*args.first) or super
     end
 
     def to_json
