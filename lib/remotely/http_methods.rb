@@ -179,7 +179,6 @@ module Remotely
       klass = (klass || self)
 
       # strip out root json element if one is defined
-      puts "foo! #{app.strip_root_json}"
       body = body.delete(app.strip_root_json) if app.strip_root_json.present?
 
       case body
