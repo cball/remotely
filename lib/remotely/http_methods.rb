@@ -57,14 +57,15 @@ module Remotely
     #   parsed response body.
     #
     def get(path, options={})
-      path     = expand(path)
-      klass    = options.delete(:class)
-      parent   = options.delete(:parent)
+      path          = expand(path)
+      klass         = options.delete(:class)
+      parent        = options.delete(:parent)
+      response_only = options.delete(:response_only)
 
       before_request(path, :get, options)
 
       response = app.connection.get { |req| req.url(path, options) }
-      parse_response(raise_if_html(response), klass, parent)
+      parse_response(raise_if_html(response), klass, parent, response_only)
     end
 
     # POST request.
@@ -172,14 +173,16 @@ module Remotely
     #   is an array, Collection, if it's a hash, Model, otherwise it's the
     #   parsed response body.
     #
-    def parse_response(response, klass=nil, parent=nil)
+    def parse_response(response, klass=nil, parent=nil, response_only=false)
       return false if response.status >= 400
 
-      body  = Yajl::Parser.parse(response.body) rescue nil
+      body  = Yajl::Parser.parse(response.body) rescue nil      
       klass = (klass || self)
 
       # strip out root json element if one is defined
       body = body.delete(app.strip_root_json) if app.strip_root_json.present?
+
+      return body if response_only
 
       case body
       when Array
