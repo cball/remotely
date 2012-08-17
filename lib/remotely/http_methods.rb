@@ -140,7 +140,7 @@ module Remotely
     #
     def before_request(uri, http_verb = :get, options = {})
       if ENV['REMOTELY_DEBUG']
-        puts "-> #{http_verb.to_s.upcase} #{uri}" 
+        puts "-> #{http_verb.to_s.upcase} #{uri}"
         puts "   #{options.inspect}"
       end
     end
@@ -173,10 +173,11 @@ module Remotely
     #   is an array, Collection, if it's a hash, Model, otherwise it's the
     #   parsed response body.
     #
+    # TODO: make this args.extract_options! and return the response if we dont have klass or parent
     def parse_response(response, klass=nil, parent=nil, response_only=false)
       return false if response.status >= 400
 
-      body  = Yajl::Parser.parse(response.body) rescue nil      
+      body  = Yajl::Parser.parse(response.body) rescue nil
       klass = (klass || self)
 
       # strip out root json element if one is defined

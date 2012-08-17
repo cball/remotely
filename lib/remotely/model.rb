@@ -185,11 +185,11 @@ module Remotely
 
     # Persist this object to the remote API.
     #
-    # If the request returns a status code of 201 or 200 
+    # If the request returns a status code of 201 or 200
     # (for creating new records and updating existing ones,
-    # respectively) it is considered a successful save and returns 
-    # the object. Any other status will result in a return value 
-    # of false. In addition, the `obj.errors` collection will be 
+    # respectively) it is considered a successful save and returns
+    # the object. Any other status will result in a return value
+    # of false. In addition, the `obj.errors` collection will be
     # populated with any errors returns from the remote API.
     #
     # For `save` to handle errors correctly, the remote API should
@@ -198,18 +198,20 @@ module Remotely
     #
     #   {"errors":{"attribute":["message", "message"]}}
     #
-    # @return [Boolean] 
+    # @return [Boolean]
     #   Remote API returns 200/201 status:   true
     #   Remote API returns any other status: false
     #
     def save
       method = new_record? ? :post      : :put
       status = new_record? ? 201        : 200
-      attrs  = new_record? ? attributes : attributes.slice(*savable_attributes)
-      url    = new_record? ? uri        : URL(uri, id)
+      attrs  = new_record? ? attributes : savable_attributes_only
+      url    = new_record? ? interpolate(uri) : interpolate(URL(uri, id))
 
       resp = public_send(method, url, attrs)
-      body = Yajl::Parser.parse(resp.body)
+
+      # TODO: refactor parse_response in http_methods.rb
+      body = parse_response(resp, nil, nil, true)
 
       if resp.status == status && !body.nil?
         self.attributes.merge!(body.symbolize_keys)
@@ -222,6 +224,10 @@ module Remotely
 
     def savable_attributes
       (self.class.savable_attributes || attributes.keys) << :id
+    end
+
+    def savable_attributes_only
+      attributes.slice(*savable_attributes)
     end
 
     # Sets multiple errors with a hash
@@ -271,6 +277,18 @@ module Remotely
       Yajl::Encoder.encode(self.attributes)
     end
 
+    def cache_key
+      case
+      when new_record?
+       "#{self.class.model_name.cache_key}/new"
+      when timestamp = self.attributes[:updated_at]
+       timestamp = timestamp.to_f.to_s.gsub('.','-')
+       "#{self.class.model_name.cache_key}/#{id}-#{timestamp}"
+      else
+         "#{self.class.model_name.cache_key}/#{id}"
+      end
+    end
+
   private
 
     def metaclass
@@ -298,7 +316,7 @@ module Remotely
     def method_missing(name, *args, &block)
       if self.attributes.include?(name)
         self.attributes[name]
-      elsif name =~ /(.*)=$/ && self.attributes.include?($1.to_sym)
+      elsif name =~ /(.*)=$/
         self.attributes[$1.to_sym] = args.first
       elsif name =~ /(.*)\?$/ && self.attributes.include?($1.to_sym)
         !!self.attributes[$1.to_sym]
