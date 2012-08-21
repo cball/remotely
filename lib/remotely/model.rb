@@ -308,6 +308,8 @@ module Remotely
     end
 
     def fetch(name, id, reload)
+      association = remote_associations[name.to_sym]
+      name = association[:class_name] if association[:class_name].present?
       klass = name.to_s.classify.constantize
       set_association(name, klass.find(id)) if reload || association_undefined?(name)
       get_association(name)
