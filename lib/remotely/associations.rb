@@ -216,9 +216,11 @@ module Remotely
     end
 
     def fetch_association(name)
-      type     = remote_associations[name][:type]
-      klass    = name.to_s.classify.constantize
-      response = klass.get(path_to(name, type), :class => klass, :parent => self)
+      opts = remote_associations[name]
+      type       = remote_associations[name][:type]
+      class_name = remote_associations[name][:class_name] if remote_associations[name][:class_name].present?
+      klass      = (class_name || name).to_s.classify.constantize
+      response   = klass.get(path_to(name, type), :class => klass, :parent => self)
       set_association(name, response)
     end
 
