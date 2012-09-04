@@ -116,8 +116,8 @@ module Remotely
       #
       # @return [Boolean] If the destruction succeeded.
       #
-      def destroy(id)
-        http_delete URL(uri, id)
+      def destroy(id, base_uri=URL(uri, id))
+        http_delete base_uri
       end
 
       alias :destroy! :destroy
@@ -245,7 +245,7 @@ module Remotely
     # Destroy this object with the might of 60 jotun!
     #
     def destroy
-      self.class.destroy(id)
+      self.class.destroy(id, interpolate(URL(uri, id)))
     end
 
     # Re-fetch the resource from the remote API.
