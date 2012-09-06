@@ -25,6 +25,24 @@ module Remotely
         @savable_attributes.uniq!
       end
 
+      # List of default attributes that all instances of this class have by
+      # default. This more closely mimics ActiveRecord's new method.
+      #
+      # @param [Symbols] *attrs List of attributes to initialize with.
+      #
+      # @example Mark `name` and `age` as defaults
+      #   attr_default :name, :age
+      #
+      # Member.new
+      # => #<Member:0x007fdae1233d68 @attributes={:name=>nil, :age=>nil}>
+      #
+      def attr_default(*attrs)
+        @default_attributes ||= []
+        @default_attributes += attrs
+        @default_attributes.uniq!
+      end
+      attr_reader :default_attributes
+
       # Fetch all entries.
       #
       # @return [Remotely::Collection] collection of entries
@@ -155,6 +173,12 @@ module Remotely
 
     def initialize(attributes={})
       set_errors(attributes.delete('errors')) if attributes['errors']
+
+      if self.class.default_attributes.present?
+        default_attributes = Hash[self.class.default_attributes.map{|a| [a] }]
+        attributes.merge! default_attributes
+      end
+
       self.attributes = attributes.symbolize_keys
       associate!
     end
