@@ -176,7 +176,7 @@ module Remotely
 
       if self.class.default_attributes.present?
         default_attributes = Hash[self.class.default_attributes.map{|a| [a] }]
-        attributes.merge! default_attributes
+        attributes.reverse_merge! default_attributes
       end
 
       self.attributes = attributes.symbolize_keys
