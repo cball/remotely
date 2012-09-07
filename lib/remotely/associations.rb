@@ -226,7 +226,7 @@ module Remotely
           attributes_collection.values
         end
 
-        klass = association_name.to_s.singularize.classify.constantize
+        klass = association_name.to_s.classify.constantize
         assocations = attributes_collection.map do |attributes|
           attributes = attributes.with_indifferent_access
           klass.new attributes

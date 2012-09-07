@@ -174,9 +174,18 @@ module Remotely
     def initialize(attributes={})
       set_errors(attributes.delete('errors')) if attributes['errors']
 
+      # add default attributes
       if self.class.default_attributes.present?
         default_attributes = Hash[self.class.default_attributes.map{|a| [a] }]
         attributes.reverse_merge! default_attributes
+      end
+
+      # add nested attributes
+      attributes.reject! do |k, v|
+        if self.class.method_defined?("#{k}=") && v.is_a?(Hash)
+          send("#{k}=", v)
+          true
+        end
       end
 
       self.attributes = attributes.symbolize_keys
