@@ -142,6 +142,24 @@ module Remotely
         define_association_method(:belongs_to, name, options)
       end
 
+      # Basic version of Active Record's accepts_nested_attributes for
+      # that looks at the exisiting remotely associations.
+      # borrowed from Rails:
+      # https://github.com/rails/rails/blob/8510a0bb5a8a65e4bc067ee5a7d98aae965b47a5/activerecord/lib/active_record/nested_attributes.rb#L263
+      def accepts_nested_attributes_for(*attr_names)
+        attr_names.extract_options!
+        attr_names.each do |association_name|
+          if association = self.remote_associations[association_name]
+            type = association[:type]
+            class_eval <<-eoruby, __FILE__, __LINE__ + 1
+              def #{association_name}_attributes=(attributes)
+                assign_nested_attributes_for_#{type}_association(:#{association_name}, attributes)
+              end
+            eoruby
+          end
+        end
+      end
+
     private
 
       def define_association_method(type, name, options)
@@ -193,6 +211,30 @@ module Remotely
     end
 
   private
+
+    # assign_nested_attributes logic borrowed from rails:
+    # https://github.com/rails/rails/blob/8510a0bb5a8a65e4bc067ee5a7d98aae965b47a5/activerecord/lib/active_record/nested_attributes.rb#L371
+    def assign_nested_attributes_for_has_many_association(association_name, attributes_collection)
+      unless attributes_collection.is_a?(Hash) || attributes_collection.is_a?(Array)
+        raise ArgumentError, "Hash or Array expected, got #{attributes_collection.class.name} (#{attributes_collection.inspect})"
+      end
+      if attributes_collection.is_a? Hash
+        keys = attributes_collection.keys
+        attributes_collection = if keys.include?('id') || keys.include?(:id)
+          Array.wrap(attributes_collection)
+        else
+          attributes_collection.values
+        end
+
+        klass = association_name.to_s.singularize.classify.constantize
+        assocations = attributes_collection.map do |attributes|
+          attributes = attributes.with_indifferent_access
+          klass.new attributes
+        end
+
+        set_association(association_name, assocations)
+      end
+    end
 
     def can_fetch_remotely_association?(name)
       opts = remote_associations[name]

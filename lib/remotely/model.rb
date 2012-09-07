@@ -33,8 +33,8 @@ module Remotely
       # @example Mark `name` and `age` as defaults
       #   attr_default :name, :age
       #
-      # Member.new
-      # => #<Member:0x007fdae1233d68 @attributes={:name=>nil, :age=>nil}>
+      # User.new {foo: true}
+      # => #<User:0x007fdae1233d68 @attributes={:foo => true, :name=>nil, :age=>nil}>
       #
       def attr_default(*attrs)
         @default_attributes ||= []
