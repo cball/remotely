@@ -182,7 +182,7 @@ module Remotely
 
       # add nested attributes
       attributes.reject! do |k, v|
-        if self.class.method_defined?("#{k}=") && v.is_a?(Hash)
+        if k.end_with?('_attributes') && self.class.method_defined?("#{k}=") && v.is_a?(Hash)
           send("#{k}=", v)
           true
         end
