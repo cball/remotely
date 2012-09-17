@@ -181,7 +181,9 @@ module Remotely
       klass = (klass || self)
 
       # strip out root json element if one is defined
-      body = body.delete(app.strip_root_json) if app.strip_root_json.present?
+      if app.strip_root_json.present? && body.is_a?(Hash) && body.has_key?(app.strip_root_json)
+        body = body.delete(app.strip_root_json)
+      end
 
       return body if response_only
 
