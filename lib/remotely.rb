@@ -80,6 +80,8 @@ module Remotely
   end
 end
 
-module ActiveRecord
-  class Base; include Remotely::Associations end
+if defined?(ActiveRecord)
+  module ActiveRecord
+    class Base; include Remotely::Associations end
+  end
 end
