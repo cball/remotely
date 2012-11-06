@@ -49,6 +49,22 @@ module Remotely
       @strip_root_json = strip_root_json
     end
 
+    # Response to check every request to see if there is an remote authentication error
+    #
+    # @param [Hash, String] auth_exception_response reponse to check against
+    def auth_exception_response(auth_exception_response=nil)
+      return @auth_exception_response unless auth_exception_response
+      @auth_exception_response = auth_exception_response
+    end
+
+    # The exception to throw if auth_exception_response is found
+    #
+    # @param [Exception, String] auth_exception exception or string to raise if auth_exception_response is found.
+    def auth_exception(auth_exception)
+      return @auth_exception unless auth_exception
+      @auth_exception_response = 'Auth Exception'
+    end
+
   private
 
     def set_scheme(url)

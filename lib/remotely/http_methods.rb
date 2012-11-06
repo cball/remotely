@@ -185,6 +185,13 @@ module Remotely
         body = body.delete(app.strip_root_json)
       end
 
+      # raise auth error if one is configured and we have the specified response
+      if app.auth_exception_response.present?
+        if body == app.auth_exception_response
+          raise app.auth_exception || 'Authentication Error'
+        end
+      end
+
       return body if response_only
 
       case body
