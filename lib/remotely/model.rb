@@ -315,7 +315,8 @@ module Remotely
       when new_record?
        "#{self.class.model_name.cache_key}/new"
       when timestamp = self.attributes[:updated_at]
-       timestamp = timestamp.to_f.to_s.gsub('.','-')
+       timestamp = Time.parse timestamp if timestamp.is_a?(String)
+       timestamp = timestamp.utc.to_s(:number)
        "#{self.class.model_name.cache_key}/#{id}-#{timestamp}"
       else
          "#{self.class.model_name.cache_key}/#{id}"
