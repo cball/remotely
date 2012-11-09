@@ -61,7 +61,7 @@ module Remotely
       #
       # @return [Remotely::Model] Single model object.
       #
-      def find(id, options)
+      def find(id, options={})
         get URL(uri, id), options
       end
 
