@@ -61,8 +61,7 @@ module Remotely
       #
       # @return [Remotely::Model] Single model object.
       #
-      def find(id, *args)
-        options = args.extract_options!
+      def find(id, options)
         get URL(uri, id), options
       end
 
