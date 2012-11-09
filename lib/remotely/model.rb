@@ -61,8 +61,9 @@ module Remotely
       #
       # @return [Remotely::Model] Single model object.
       #
-      def find(id)
-        get URL(uri, id)
+      def find(id, *args)
+        options = args.extract_options!
+        get URL(uri, id), options
       end
 
       # Fetch the first record matching +attrs+ or initialize a new instance
@@ -338,6 +339,29 @@ module Remotely
       self.attributes.select { |k,v| k =~ /_id$/ }.each do |key, id|
         name = key.to_s.gsub("_id", "")
         metaclass.send(:define_method, name) { |reload=false| fetch(name, id, reload) }
+      end
+
+      set_associated_objects!
+    end
+
+    # If the json response already contains nested associated objects, set them up
+    def set_associated_objects!
+      remote_associations.keys.each do |association_name|
+        if attributes.include? association_name
+
+          attrs = attributes[association_name]
+          return unless attrs
+
+          klass = association_name.to_s.classify.constantize
+          new_object = case attrs
+          when Array
+            Collection.new(self, klass, attrs.map { |o| klass.new(o) })
+          when Hash
+            klass.new(attrs)
+          end
+
+          set_association association_name, new_object
+        end
       end
     end
 
