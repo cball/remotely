@@ -21,9 +21,10 @@ module Remotely
     # @param [String] user BasicAuth user
     # @param [String] password BasicAuth password
     #
-    def basic_auth(user=nil, password=nil)
-      return @basic_auth unless user && password
-      @basic_auth = [user, password]
+    # user=nil, password=nil
+    def basic_auth(*args_or_proc)
+      return @basic_auth unless args_or_proc
+      @basic_auth = args_or_proc
     end
 
     # Connection to the application (with BasicAuth if it was set).
@@ -36,7 +37,14 @@ module Remotely
         b.adapter :net_http
       end
 
-      @connection.basic_auth(*@basic_auth) if @basic_auth
+      proc_or_username = @basic_auth.first
+      if proc_or_username.respond_to?(:call)
+        username_password = proc_or_username.call
+        @connection.basic_auth(*username_password)
+      elsif proc_or_username
+        @connection.basic_auth(*basic_auth)
+      end
+
       @connection
     end
 
