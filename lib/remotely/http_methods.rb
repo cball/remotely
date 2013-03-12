@@ -175,7 +175,7 @@ module Remotely
     #
     # TODO: make this args.extract_options! and return the response if we dont have klass or parent
     def parse_response(response, klass=nil, parent=nil, response_only=false)
-      return false if response.status >= 400
+      return false if response.status >= 400 && response.status != 422
 
       body  = Yajl::Parser.parse(response.body) rescue nil
       klass = (klass || self)
